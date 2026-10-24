@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catatan Keuangan</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <button class="theme" id="theme" type="button">Mode gelap</button>
+  <h1>Catatan Keuangan</h1>
+  <p class="sub">Catat pemasukan dan pengeluaran. Data tersimpan di browser Anda.</p>
+
+  <section class="saldo">
+    <small>Saldo saat ini</small>
+    <div class="big" id="saldo">Rp0</div>
+    <div class="io">
+      <div><small>Pemasukan</small><b id="tin">Rp0</b></div>
+      <div><small>Pengeluaran</small><b id="tout">Rp0</b></div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <div class="stack">
+      <section class="card">
+        <h2>Tambah catatan</h2>
+        <div class="seg" id="seg">
+          <button type="button" data-t="in" class="in on">Pemasukan</button>
+          <button type="button" data-t="out" class="out">Pengeluaran</button>
+        </div>
+        <label for="nom">Nominal (Rp)</label>
+        <input id="nom" type="text" inputmode="numeric" placeholder="50.000">
+        <label for="kat">Kategori</label>
+        <select id="kat"></select>
+        <label for="tgl">Tanggal</label>
+        <input id="tgl" type="date">
+        <label for="cat">Keterangan</label>
+        <input id="cat" type="text" maxlength="60" placeholder="Contoh: makan siang">
+        <button class="add" id="add" type="button">Simpan catatan</button>
+      </section>
+      <section class="card">
+        <h2>Pengeluaran per kategori</h2>
+        <div id="bars"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Riwayat</h2>
+      <div class="filters">
+        <input id="fbulan" type="month" aria-label="Filter bulan">
+        <select id="ftipe" aria-label="Filter jenis">
+          <option value="all">Semua jenis</option>
+          <option value="in">Pemasukan</option>
+          <option value="out">Pengeluaran</option>
+        </select>
+      </div>
+      <div id="list"></div>
+    </section>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+    <style>
+        :root{--bg:#edf1ef;--card:#fff;--ink:#17262b;--mute:#62747a;--line:#d8e0dd;--in:#0f7b6c;--out:#c2412d;--accent:#1d4e5f;--r:14px;
+    box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+    @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1a1d;--card:#172529;--ink:#e6efed;--mute:#8da0a5;--line:#263a3f;--in:#3fc2ac;--out:#f0816d;--accent:#7cc4d8}}
+    :root[data-theme="dark"]{--bg:#0f1a1d;--card:#172529;--ink:#e6efed;--mute:#8da0a5;--line:#263a3f;--in:#3fc2ac;--out:#f0816d;--accent:#7cc4d8}
+    html{scroll-padding-top:env(safe-area-inset-top,0px)}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+    .wrap{max-width:960px;margin:0 auto;padding:20px 16px 48px}
+    h1{font-size:1.4rem;font-weight:800;margin:0 0 4px}
+    .sub{color:var(--mute);margin:0 0 20px;font-size:.92rem}
+    .saldo{background:var(--accent);color:#fff;border-radius:var(--r);padding:22px;margin-bottom:14px}
+    :root[data-theme="dark"] .saldo,:root:not([data-theme="light"]) .saldo{color:#0f1a1d}
+    .saldo small{opacity:.8;font-size:.85rem}
+    .saldo .big{font-size:clamp(1.8rem,7vw,2.8rem);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin:2px 0 14px}
+    .io{display:flex;gap:24px;flex-wrap:wrap}
+    .io b{display:block;font-size:1.05rem}
+    .grid{display:grid;grid-template-columns:340px 1fr;gap:14px;align-items:start}
+    @media(max-width:780px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+    .card h2{font-size:1rem;margin:0 0 12px;font-weight:700}
+    label{display:block;font-size:.82rem;color:var(--mute);margin:10px 0 4px}
+    input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+    input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+    .seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+    .seg button{padding:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;font:inherit;font-weight:600;cursor:pointer}
+    .seg button.on.in{background:var(--in);border-color:var(--in);color:#fff}
+    .seg button.on.out{background:var(--out);border-color:var(--out);color:#fff}
+    .add{width:100%;margin-top:16px;padding:12px;border:0;border-radius:10px;background:var(--ink);color:var(--bg);font:inherit;font-weight:700;cursor:pointer}
+    .filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .filters>*{flex:1;min-width:130px}
+    .item{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+    .item:first-of-type{border-top:0}
+    .dot{width:10px;height:10px;border-radius:50%;flex:none}
+    .info{flex:1;min-width:0}
+    .info b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .info span{font-size:.8rem;color:var(--mute)}
+    .amt{font-weight:700;white-space:nowrap}
+    .amt.in{color:var(--in)}.amt.out{color:var(--out)}
+    .del{border:0;background:none;color:var(--mute);cursor:pointer;font-size:1.2rem;padding:4px 8px;border-radius:8px}
+    .del:hover{color:var(--out)}
+    .empty{color:var(--mute);text-align:center;padding:28px 8px}
+    .bar{margin:10px 0}
+    .bar .t{display:flex;justify-content:space-between;font-size:.85rem}
+    .bar .tr{height:8px;background:var(--bg);border-radius:6px;margin-top:4px;overflow:hidden}
+    .bar .tr i{display:block;height:100%;background:var(--out);border-radius:6px}
+    .stack{display:grid;gap:14px}
+    .theme{float:right;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:6px 10px;cursor:pointer;font:inherit;font-size:.85rem}
+    </style>
+    <script>
+        const KAT={in:["Gaji","Bonus","Usaha","Hadiah","Lainnya"],out:["Makanan","Transportasi","Tagihan","Belanja","Kesehatan","Hiburan","Pendidikan","Lainnya"]};
+    const KEY="catatan-keuangan-v1";
+    let data=[],tipe="in";
+    try{data=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){data=[]}
+    const $=id=>document.getElementById(id);
+    const rp=n=>"Rp"+Math.round(n).toLocaleString("id-ID");
+    const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}};
+    const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+
+    function fillKat(){$("kat").innerHTML=KAT[tipe].map(k=>`<option>${k}</option>`).join("")}
+    $("seg").addEventListener("click",e=>{
+    const b=e.target.closest("button");if(!b)return;
+    tipe=b.dataset.t;
+    [...$("seg").children].forEach(x=>x.classList.toggle("on",x===b));
+    fillKat();
+    });
+    $("nom").addEventListener("input",e=>{
+    const v=e.target.value.replace(/\D/g,"");
+    e.target.value=v?Number(v).toLocaleString("id-ID"):"";
+    });
+    $("add").addEventListener("click",()=>{
+    const n=Number($("nom").value.replace(/\D/g,""));
+    if(!n){$("nom").focus();return}
+    data.push({id:Date.now(),tipe,n,kat:$("kat").value,tgl:$("tgl").value||today(),cat:$("cat").value.trim()});
+    save();$("nom").value="";$("cat").value="";render();
+    });
+    $("list").addEventListener("click",e=>{
+    const b=e.target.closest("[data-del]");if(!b)return;
+    data=data.filter(x=>x.id!=b.dataset.del);save();render();
+    });
+    $("fbulan").addEventListener("input",render);
+    $("ftipe").addEventListener("input",render);
+
+    function render(){
+    const tin=data.filter(x=>x.tipe==="in").reduce((a,x)=>a+x.n,0);
+    const tout=data.filter(x=>x.tipe==="out").reduce((a,x)=>a+x.n,0);
+    $("saldo").textContent=rp(tin-tout);$("tin").textContent=rp(tin);$("tout").textContent=rp(tout);
+
+    const bln=$("fbulan").value,ft=$("ftipe").value;
+    const rows=data.filter(x=>(!bln||x.tgl.startsWith(bln))&&(ft==="all"||x.tipe===ft))
+        .sort((a,b)=>b.tgl.localeCompare(a.tgl)||b.id-a.id);
+
+    $("list").innerHTML=rows.length?rows.map(x=>{
+        const d=new Date(x.tgl+"T00:00").toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"});
+        const s=x.cat.replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]));
+        return `<div class="item"><i class="dot" style="background:var(--${x.tipe})"></i>
+        <div class="info"><b>${s||x.kat}</b><span>${x.kat} · ${d}</span></div>
+        <div class="amt ${x.tipe}">${x.tipe==="in"?"+":"−"}${rp(x.n)}</div>
+        <button class="del" data-del="${x.id}" aria-label="Hapus catatan">×</button></div>`}).join("")
+        :`<div class="empty">Belum ada catatan. Isi formulir di samping untuk mulai mencatat.</div>`;
+
+    const out=rows.filter(x=>x.tipe==="out"),tot=out.reduce((a,x)=>a+x.n,0),per={};
+    out.forEach(x=>per[x.kat]=(per[x.kat]||0)+x.n);
+    const ent=Object.entries(per).sort((a,b)=>b[1]-a[1]);
+    $("bars").innerHTML=ent.length?ent.map(([k,v])=>`<div class="bar"><div class="t"><span>${k}</span><span>${rp(v)} (${Math.round(v/tot*100)}%)</span></div><div class="tr"><i style="width:${v/tot*100}%"></i></div></div>`).join("")
+        :`<div class="empty">Belum ada pengeluaran pada filter ini.</div>`;
+    }
+
+    $("theme").addEventListener("click",()=>{
+    const r=document.documentElement;
+    const dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;
+    r.dataset.theme=dark?"light":"dark";
+    $("theme").textContent=dark?"Mode gelap":"Mode terang";
+    });
+
+    $("tgl").value=today();fillKat();render();
+    </script>
+</html>
